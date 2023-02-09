@@ -11,8 +11,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   void count() {
-    Future.delayed(Duration(seconds: 1), () {
-      nextPageReplacement(context, LoginPage());
+    Future.delayed(const Duration(seconds: 1), () {
+      nextPageReplacement(context, const LoginPage());
     });
   }
 

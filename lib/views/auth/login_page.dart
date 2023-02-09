@@ -1,6 +1,10 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:tiktok_new_clone/controller/auth_provider.dart';
+import 'package:get/get.dart';
+import 'package:tiktok_new_clone/controller/auth_controller.dart';
+import 'package:tiktok_new_clone/utils/router.dart';
+import 'package:tiktok_new_clone/views/auth/register_page.dart';
+import 'package:tiktok_new_clone/views/auth/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,20 +17,17 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
   void submit() {
-    setState(() {
-      _autoValidateMode = AutovalidateMode.always;
-    });
-
     final form = _formKey.currentState;
 
-    if (form == null || !form.validate()) return;
+    if (form == null || !form.validate()) {
+      return;
+    }
 
     form.save();
 
-    AuthController()
+    AuthController.instance
         .signInUser(_emailController.text, _passwordController.text);
 
     print("email: $_emailController, password: $_passwordController");
@@ -46,7 +47,6 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Form(
             key: _formKey,
-            autovalidateMode: _autoValidateMode,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -61,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextFormField(
                     controller: _emailController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
                       hintText: 'Email',
                       label: Text('Email'),
@@ -73,7 +74,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (!EmailValidator.validate(value)) {
                         return 'Enter a valid email';
                       }
-                      print(value);
                     },
                   ),
                   const SizedBox(
@@ -81,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextFormField(
                     controller: _passwordController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     obscureText: true,
                     decoration: const InputDecoration(
                       hintText: 'Password',
@@ -119,7 +120,9 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          nextPage(context, SignupScreen());
+                        },
                         child: const Text(
                           'Register Now',
                           style: TextStyle(color: Colors.blue),

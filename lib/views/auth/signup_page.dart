@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tiktok_new_clone/utils/constants.dart';
-import 'package:tiktok_new_clone/views/auth/login_page.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -44,8 +44,19 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              kButtomColor.withOpacity(0.4),
+              Colors.transparent,
+            ],
+            center: Alignment.topCenter,
+          ),
+        ),
         alignment: Alignment.center,
         child: SingleChildScrollView(
           child: Form(
@@ -53,17 +64,9 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               children: [
                 const Text(
-                  'Tiktok Clone',
-                  style: TextStyle(
-                    fontSize: 35,
-                    // color: buttonColor,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const Text(
                   'Register',
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 35,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -74,21 +77,26 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     CircleAvatar(
                       radius: 64,
-                      backgroundColor: Colors.grey,
-                      child: GestureDetector(
-                          onTap: () => authController.pickImage(),
-                          child: Icon(Icons.person)),
+                      backgroundColor: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: GestureDetector(
+                            onTap: () => authController.pickImage(),
+                            child: authController.profilePhoto == null
+                                ? const Icon(Icons.camera)
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(64.0),
+                                    child: SizedBox(
+                                      width: 64 * 2,
+                                      height: 64 * 2,
+                                      child: Image.file(
+                                        authController.profilePhoto!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )),
+                      ),
                     ),
-                    // Positioned(
-                    //   bottom: -10,
-                    //   left: 80,
-                    //   child: IconButton(
-                    //     onPressed: () => authController.pickImage(),
-                    //     icon: const Icon(
-                    //       Icons.add_a_photo,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
                 const SizedBox(
@@ -168,24 +176,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 30,
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
+                  width: screenSize.width / 1.5,
+                  height: screenSize.height * 0.07,
                   decoration: const BoxDecoration(
-                    // color: buttonColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(55.0)),
                   ),
-                  child: InkWell(
-                    onTap: () => submit(),
-                    child: const Center(
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                  child: TextButton(
+                    onPressed: () => submit(),
+                    child: Text(
+                      'Register',
+                      style: TextStyle(color: kBackgroundColor),
                     ),
                   ),
                 ),
@@ -197,19 +198,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     const Text(
                       'Already have an account? ',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
                     ),
-                    InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                      ),
+                    TextButton(
+                      onPressed: () => Get.back(),
                       child: const Text(
                         'Login',
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(color: kButtomColor),
                       ),
                     ),
                   ],

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tiktok_new_clone/model/user.dart' as model;
@@ -11,7 +12,7 @@ import 'package:tiktok_new_clone/views/home_page.dart';
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
 
-  late Rx<File?> _profileImage;
+  Rx<File?>? _profileImage;
   late Rx<User?> _user;
 
   @override
@@ -22,7 +23,7 @@ class AuthController extends GetxController {
     super.onReady();
   }
 
-  File? get profilePhoto => _profileImage.value;
+  File? get profilePhoto => _profileImage?.value;
   User get user => _user.value!;
 
   _screenDecide(User? user) {
@@ -34,13 +35,25 @@ class AuthController extends GetxController {
   }
 
   void pickImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      Get.snackbar('Image Info', 'Image has been selected');
-    } else {
-      Get.snackbar('Image info', 'please select an image');
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        Get.snackbar(
+          '🎉',
+          'Image has been Selected',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          '😟',
+          'please select an image',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+      _profileImage = Rx(File(image!.path));
+    } on Exception catch (e) {
+      debugPrint(e.toString());
     }
-    _profileImage = Rx(File(image!.path));
   }
 
   Future<String> _uploadtoStorage(File image) async {
@@ -59,31 +72,28 @@ class AuthController extends GetxController {
       String username, String email, String password, File? image) async {
     try {
       // Registering user with email and password
-      if (username.isNotEmpty &&
-          email.isNotEmpty &&
-          password.isNotEmpty &&
-          image != null) {
-        UserCredential cred = await firebaseAuth.createUserWithEmailAndPassword(
-            email: email, password: password);
 
-        // Storing extra information into firestore and storage
-        String profilePicdownloadUrl = await _uploadtoStorage(image);
-        model.User user = model.User(
-            name: username,
-            email: email,
-            uid: cred.user!.uid,
-            profilePhoto: profilePicdownloadUrl);
+      UserCredential cred = await firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
 
-        await firebaseFirestore
-            .collection('users')
-            .doc(cred.user!.uid)
-            .set(user.toJson());
-      } else {
-        Get.snackbar('Account creation error',
-            'Something went wrong with account creation');
-      }
+      // Storing extra information into firestore and storage
+      String profilePicdownloadUrl = await _uploadtoStorage(image!);
+      model.User user = model.User(
+          name: username,
+          email: email,
+          uid: cred.user!.uid,
+          profilePhoto: profilePicdownloadUrl);
+
+      await firebaseFirestore
+          .collection('users')
+          .doc(cred.user!.uid)
+          .set(user.toJson());
     } on FirebaseException catch (e) {
-      Get.snackbar('Signup Error', 'Something went wrong while registering');
+      Get.snackbar(
+        'Try Again',
+        'Something went wrong while registering',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       print(e.toString());
     }
   }
@@ -93,8 +103,25 @@ class AuthController extends GetxController {
       await firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseException catch (e) {
-      Get.snackbar(
-          'Error logging in', 'Something went wrong with signin. Try again!');
+      if (e.code == 'user-not-found') {
+        Get.snackbar(
+          'No user found',
+          'Seems like the user is not registered yet',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else if (e.code == 'wrong-password') {
+        Get.snackbar(
+          'Wrong Password',
+          'Please enter correct password',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          '😥',
+          'Something went wrong. Try again!',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
 
       print(e.toString());
     }

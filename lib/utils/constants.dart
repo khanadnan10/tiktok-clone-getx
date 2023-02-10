@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/Material.dart';
 import 'package:tiktok_new_clone/controller/auth_controller.dart';
 
-const kBackgroundColor = Colors.black;
+Color kBackgroundColor = Colors.black;
 const kButtomColor = Color(0xfffd2c54);
 Color kGreyColor = Colors.grey.shade100;
 

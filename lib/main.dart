@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tiktok_new_clone/views/auth/login_page.dart';
-import 'package:tiktok_new_clone/views/splash_screen.dart';
 import 'controller/auth_controller.dart';
 import 'firebase_options.dart';
 
